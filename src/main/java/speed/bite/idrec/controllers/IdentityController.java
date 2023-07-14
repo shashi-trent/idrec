@@ -25,8 +25,16 @@ public class IdentityController {
 
     @PostMapping("/")
     public ResponseEntity reconcileIdentity(@RequestBody IdentityRequest identityRequest) {
-        if(Objects.isNull(identityRequest) || (!StringUtils.hasText(identityRequest.getEmail())
-            && !StringUtils.hasText(identityRequest.getPhoneNumber()))) {
+        if(Objects.isNull(identityRequest)) {
+            return BasicResponse.err(HttpStatus.BAD_REQUEST, "Request Body must not be null");
+        }
+
+        identityRequest.setEmail(StringUtils.hasText(identityRequest.getEmail())
+                ? identityRequest.getEmail().trim() : null);
+        identityRequest.setPhoneNumber(StringUtils.hasText(identityRequest.getPhoneNumber())
+                ? identityRequest.getPhoneNumber().trim() : null);
+
+        if(Objects.isNull(identityRequest.getEmail()) && Objects.isNull(identityRequest.getPhoneNumber())) {
             return BasicResponse.err(HttpStatus.BAD_REQUEST, "Request Body must contain email and/or phoneNumber");
         }
 
