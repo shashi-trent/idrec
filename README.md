@@ -3,7 +3,11 @@
 ### to run
 <hr>
 
-`docker-compose up --build`
+1. cd to project directory, and then
+
+2. `docker-compose up --build`
+
+note: might need to run with `sudo`, depends on how docker is configured..
 
 <br>
 
