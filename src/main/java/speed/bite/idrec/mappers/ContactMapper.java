@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.Update;
 import speed.bite.idrec.enums.LinkPrecedence;
 import speed.bite.idrec.pojos.models.ContactModel;
 
+import java.util.List;
+
 @Mapper
 public interface ContactMapper {
 
@@ -28,6 +30,10 @@ public interface ContactMapper {
     @Select("select distinct linked_id from contact where deleted_at is null and " +
             "linked_id is not null and phone_number=#{phoneNumber} limit 1")
     Integer getLinkedIdByPhone(String phoneNumber);
+
+
+    @Select("select * from contact where deleted_at is null and linked_id=#{id}")
+    List<ContactModel> getSecondaryContacts(int id);
 
 
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")

@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 import speed.bite.idrec.enums.LinkPrecedence;
 import speed.bite.idrec.mappers.ContactMapper;
 import speed.bite.idrec.pojos.ContactInfo;
+import speed.bite.idrec.pojos.IdentityResponse;
 import speed.bite.idrec.pojos.models.ContactModel;
 
 import java.util.HashSet;
@@ -21,7 +22,7 @@ public class ContactService {
     @Autowired
     private ContactMapper contactMapper;
 
-    public ContactInfo getReconciledContactResponse(String email, String phoneNumber) {
+    public IdentityResponse getReconciledContactResponse(String email, String phoneNumber) {
         ContactModel reconciledContact = reconcileIdentity(email, phoneNumber);
 
         ContactInfo contactInfo = new ContactInfo(reconciledContact);
@@ -47,7 +48,7 @@ public class ContactService {
             contactInfo.getSecondaryContactIds().add(contactModel.getId());
         });
 
-        return contactInfo;
+        return IdentityResponse.builder().contact(contactInfo).build();
     }
 
 
