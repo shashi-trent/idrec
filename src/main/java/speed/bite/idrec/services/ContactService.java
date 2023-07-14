@@ -6,16 +6,49 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import speed.bite.idrec.enums.LinkPrecedence;
 import speed.bite.idrec.mappers.ContactMapper;
+import speed.bite.idrec.pojos.ContactInfo;
 import speed.bite.idrec.pojos.models.ContactModel;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ContactService {
 
     @Autowired
     private ContactMapper contactMapper;
+
+    public ContactInfo getReconciledContactResponse(String email, String phoneNumber) {
+        ContactModel reconciledContact = reconcileIdentity(email, phoneNumber);
+
+        ContactInfo contactInfo = new ContactInfo(reconciledContact);
+        Set<String> emailsSeen = new HashSet<>(){{
+            add(null);
+            add(reconciledContact.getEmail());
+        }};
+        Set<String> phonesSeen = new HashSet<>(){{
+            add(null);
+            add(reconciledContact.getPhoneNumber());
+        }};
+
+        List<ContactModel> contactModels = contactMapper.getSecondaryContacts(reconciledContact.getId());
+        contactModels.forEach(contactModel -> {
+            if(!emailsSeen.contains(contactModel.getEmail())) {
+                contactInfo.getEmails().add(contactModel.getEmail());
+                emailsSeen.add(contactModel.getEmail());
+            }
+            if(!phonesSeen.contains(contactModel.getPhoneNumber())) {
+                contactInfo.getPhoneNumbers().add(contactModel.getPhoneNumber());
+                phonesSeen.add(contactModel.getPhoneNumber());
+            }
+            contactInfo.getSecondaryContactIds().add(contactModel.getId());
+        });
+
+        return contactInfo;
+    }
 
 
     @Transactional
