@@ -16,14 +16,14 @@ import speed.bite.idrec.services.ContactService;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/identity")
+@RequestMapping("/")
 @Slf4j
 public class IdentityController {
 
     @Autowired
     private ContactService contactService;
 
-    @PostMapping("/")
+    @PostMapping(path = {"identify", "identify/"})
     public ResponseEntity reconcileIdentity(@RequestBody IdentityRequest identityRequest) {
         if(Objects.isNull(identityRequest)) {
             return BasicResponse.err(HttpStatus.BAD_REQUEST, "Request Body must not be null");
