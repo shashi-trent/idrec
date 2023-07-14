@@ -1,6 +1,8 @@
 package speed.bite.idrec.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,31 +10,33 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import speed.bite.idrec.pojos.IdentityRequest;
-import speed.bite.idrec.pojos.IdentityResponse;
+import speed.bite.idrec.responses.BasicResponse;
 import speed.bite.idrec.services.ContactService;
 
 import java.util.Objects;
 
 @RestController
 @RequestMapping("/identity")
+@Slf4j
 public class IdentityController {
 
     @Autowired
     private ContactService contactService;
 
     @PostMapping("/")
-    public ResponseEntity<IdentityResponse> reconcileIdentity(@RequestBody IdentityRequest identityRequest) {
+    public ResponseEntity reconcileIdentity(@RequestBody IdentityRequest identityRequest) {
         if(Objects.isNull(identityRequest) || (!StringUtils.hasText(identityRequest.getEmail())
             && !StringUtils.hasText(identityRequest.getPhoneNumber()))) {
-            throw new IllegalArgumentException("Request Body must contain email and/or phoneNumber");
+            return BasicResponse.err(HttpStatus.BAD_REQUEST, "Request Body must contain email and/or phoneNumber");
         }
 
 
         try {
-            return ResponseEntity.ok(contactService.getReconciledContactResponse(identityRequest.getEmail(),
+            return BasicResponse.ok(contactService.getReconciledContactResponse(identityRequest.getEmail(),
                     identityRequest.getPhoneNumber()));
         } catch (Exception e) {
-            throw new InternalError("Identity Reconcile error");
+            log.error("Identity Reconcile error ", e);
+            return BasicResponse.err(HttpStatus.INTERNAL_SERVER_ERROR, "Identity Reconcile error");
         }
     }
 
