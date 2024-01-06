@@ -6,6 +6,7 @@
 1. cd to project directory, and then
 
 2. `docker-compose up --build`
+3. `docker-compose down`
 
 note: might need to run with `sudo`, depends on how docker is configured..
 
